@@ -12,11 +12,25 @@ function SongResults({ results }) {
     setActivePreviewId((current) => (current === videoId ? null : videoId));
   };
 
+  const getThumbnailUrl = (item) => {
+    if (item.thumbnail) {
+      return item.thumbnail;
+    }
+    return `https://i.ytimg.com/vi/${item.id}/hqdefault.jpg`;
+  };
+
   return (
     <div className="results">
       {results.map((item) => (
         <article key={item.id} className="song-card">
-          {item.thumbnail ? <img src={item.thumbnail} alt={item.title} /> : null}
+          <img
+            src={getThumbnailUrl(item)}
+            alt={item.title}
+            loading="lazy"
+            onError={(event) => {
+              event.currentTarget.src = `https://i.ytimg.com/vi/${item.id}/mqdefault.jpg`;
+            }}
+          />
           <div className="song-info">
             <h3>{item.title}</h3>
             <p>{item.uploader || "Unknown uploader"}</p>
