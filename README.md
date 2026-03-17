@@ -11,9 +11,10 @@ This project is built for **learning backend architecture, API integration, and 
 - Search songs by name
 - Fetch top 5 YouTube results with thumbnails
 - Select the best match and download as MP3
+- Choose MP3 quality (128 / 192 / 320 kbps) before download
 - REST API backend with FastAPI
 - React frontend with live search
-- Audio conversion using FFmpeg at 192 kbps
+- Audio conversion using FFmpeg with selectable bitrate
 
 ---
 
@@ -156,7 +157,7 @@ Returns top 5 YouTube results for the query.
 }
 ```
 
-### `GET /download?song={song_name}&video_url={youtube_url}`
+### `GET /download?song={song_name}&video_url={youtube_url}&quality={128|192|320}`
 Downloads and converts the audio to MP3, returns the file directly.
 
 ---
@@ -166,8 +167,8 @@ Downloads and converts the audio to MP3, returns the file directly.
 1. User types a song name in the search bar.
 2. Frontend calls `GET /search?song=...` on the backend.
 3. Backend queries YouTube via yt-dlp and returns 5 results.
-4. User picks a result and clicks **Download MP3**.
-5. Frontend calls `GET /download?song=...&video_url=...`.
+4. User picks a result, chooses quality, and clicks **Download MP3**.
+5. Frontend calls `GET /download?song=...&video_url=...&quality=...`.
 6. Backend downloads the audio using yt-dlp and converts it to MP3 via FFmpeg.
 7. The MP3 file is saved in `backend/downloads/` and streamed to the browser.
 8. Browser saves the file locally.

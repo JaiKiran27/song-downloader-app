@@ -38,9 +38,14 @@ async def search_song(song: str = Query(..., min_length=2)) -> dict[str, object]
 async def download_song(
     song: str = Query(..., min_length=2),
     video_url: str | None = Query(default=None),
+    quality: str = Query(default="192", pattern="^(128|192|320)$"),
 ) -> FileResponse:
     try:
-        file_path: Path = download_song_as_mp3(song_name=song, video_url=video_url)
+        file_path: Path = download_song_as_mp3(
+            song_name=song,
+            video_url=video_url,
+            quality=quality,
+        )
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Download failed: {exc}") from exc
 

@@ -17,6 +17,7 @@ else:
     from utils import ensure_directory, slugify_song_name
 
 DOWNLOADS_DIR = ensure_directory(Path(__file__).parent / "downloads")
+ALLOWED_MP3_QUALITIES = {"128", "192", "320"}
 
 
 def search_youtube(song_name: str) -> list[dict[str, Any]]:
@@ -52,8 +53,13 @@ def search_youtube(song_name: str) -> list[dict[str, Any]]:
     return parsed_results
 
 
-def download_song_as_mp3(song_name: str, video_url: str | None = None) -> Path:
+def download_song_as_mp3(
+    song_name: str,
+    video_url: str | None = None,
+    quality: str = "192",
+) -> Path:
     """Download a song from YouTube and convert it to MP3."""
+    selected_quality = quality if quality in ALLOWED_MP3_QUALITIES else "192"
     base_name = slugify_song_name(song_name)
     output_template = str(DOWNLOADS_DIR / f"{base_name}.%(ext)s")
 
@@ -69,7 +75,7 @@ def download_song_as_mp3(song_name: str, video_url: str | None = None) -> Path:
             {
                 "key": "FFmpegExtractAudio",
                 "preferredcodec": "mp3",
-                "preferredquality": "192",
+                "preferredquality": selected_quality,
             }
         ],
     }

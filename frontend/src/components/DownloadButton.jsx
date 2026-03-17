@@ -3,12 +3,17 @@ import { useState } from "react";
 function DownloadButton({ songTitle, videoUrl }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [quality, setQuality] = useState("192");
 
   const handleDownload = async () => {
     setLoading(true);
     setError("");
     try {
-      const params = new URLSearchParams({ song: songTitle, video_url: videoUrl });
+      const params = new URLSearchParams({
+        song: songTitle,
+        video_url: videoUrl,
+        quality,
+      });
       const response = await fetch(`/download?${params.toString()}`);
       if (!response.ok) {
         const text = await response.text();
@@ -22,7 +27,7 @@ function DownloadButton({ songTitle, videoUrl }) {
       document.body.appendChild(a);
       a.click();
       a.remove();
-        URL.revokeObjectURL(url);
+      URL.revokeObjectURL(url);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -32,9 +37,22 @@ function DownloadButton({ songTitle, videoUrl }) {
 
   return (
     <div>
-      <button className="download-btn" onClick={handleDownload} disabled={loading}>
-        {loading ? "Downloading…" : "Download MP3"}
-      </button>
+      <div className="download-actions">
+        <select
+          className="quality-select"
+          value={quality}
+          onChange={(event) => setQuality(event.target.value)}
+          disabled={loading}
+          aria-label="Select MP3 quality"
+        >
+          <option value="128">128 kbps</option>
+          <option value="192">192 kbps</option>
+          <option value="320">320 kbps</option>
+        </select>
+        <button className="download-btn" onClick={handleDownload} disabled={loading}>
+          {loading ? "Downloading..." : "Download MP3"}
+        </button>
+      </div>
       {error && <p style={{ color: "red", fontSize: "0.8em" }}>{error}</p>}
     </div>
   );
