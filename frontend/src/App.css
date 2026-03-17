@@ -76,11 +76,40 @@ p {
 }
 
 .quality-select {
-  padding: 10px;
+  min-width: 130px;
+  padding: 10px 36px 10px 12px;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text);
+  border: 1px solid rgba(34, 211, 238, 0.45);
+  background-color: rgba(2, 6, 23, 0.75);
+  color: #f8fafc;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, #67e8f9 50%),
+    linear-gradient(135deg, #67e8f9 50%, transparent 50%);
+  background-position: calc(100% - 18px) calc(50% - 2px), calc(100% - 12px) calc(50% - 2px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.quality-select:hover {
+  border-color: rgba(34, 211, 238, 0.75);
+  background-color: rgba(2, 6, 23, 0.9);
+}
+
+.quality-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.2);
+}
+
+.quality-select:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .search-form button:disabled {
@@ -141,5 +170,10 @@ p {
   .download-actions {
     width: 100%;
     flex-wrap: wrap;
+  }
+
+  .quality-select {
+    min-width: 0;
+    width: 100%;
   }
 }
