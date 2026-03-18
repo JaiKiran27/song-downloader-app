@@ -175,6 +175,35 @@ Downloads and converts the audio to MP3, returns the file directly.
 
 ---
 
+## ☁️ Deployment Notes (Vercel + Render)
+
+### Frontend (Vercel)
+
+- Set environment variable:
+  - `REACT_APP_API_BASE_URL=https://song-downloader-app-backend.onrender.com`
+- Redeploy frontend after changing env vars (CRA reads them at build time).
+
+### Backend (Render)
+
+- Ensure FFmpeg is available in PATH or set:
+  - `FFMPEG_LOCATION=/usr/bin` (example, if ffmpeg is in `/usr/bin/ffmpeg`)
+
+### If `/download` fails with "Sign in to confirm you're not a bot"
+
+This is a YouTube anti-bot challenge for cloud IP ranges. To reduce failures:
+
+1. Export YouTube cookies in `cookies.txt` format.
+2. Base64 encode that file content.
+3. Set Render env var:
+   - `YTDLP_COOKIES_B64=<base64-cookies-content>`
+
+The backend supports both:
+
+- `YTDLP_COOKIEFILE` (absolute path to cookies file), or
+- `YTDLP_COOKIES_B64` (base64 content), preferred for Render.
+
+---
+
 ## 🧩 Future Improvements
 
 - Download progress bar

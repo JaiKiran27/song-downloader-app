@@ -1,5 +1,7 @@
 import shutil
 import os
+import base64
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -19,15 +21,74 @@ DOWNLOADS_DIR = ensure_directory(Path(__file__).parent / "downloads")
 ALLOWED_MP3_QUALITIES = {"128", "192", "320"}
 
 
-def search_youtube(song_name: str) -> list[dict[str, Any]]:
-    """Return up to 5 YouTube search results for a song query."""
+def _cookiefile_from_env() -> str | None:
+    """Resolve yt-dlp cookiefile from env vars.
+
+    Supported env vars:
+    - YTDLP_COOKIEFILE: absolute path to cookies.txt
+    - YTDLP_COOKIES_B64: base64-encoded cookies.txt content
+    """
+    cookiefile_path = os.getenv("YTDLP_COOKIEFILE")
+    if cookiefile_path:
+        return cookiefile_path
+
+    cookies_b64 = os.getenv("YTDLP_COOKIES_B64")
+    if not cookies_b64:
+        return None
+
+    try:
+        cookie_bytes = base64.b64decode(cookies_b64)
+    except Exception as exc:
+        raise RuntimeError("YTDLP_COOKIES_B64 is not valid base64.") from exc
+
+    temp_dir = Path(tempfile.gettempdir())
+    cookie_file = temp_dir / "yt-dlp-cookies.txt"
+    cookie_file.write_bytes(cookie_bytes)
+    return str(cookie_file)
+
+
+def _base_ydl_opts() -> dict[str, Any]:
+    """Shared yt-dlp options for deployed environments."""
     ydl_opts: dict[str, Any] = {
         "quiet": True,
-        "skip_download": True,
-        "extract_flat": "in_playlist",
+        "noplaylist": True,
+        "retries": 3,
+        "extractor_retries": 3,
+        "socket_timeout": 20,
+        "http_headers": {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/123.0.0.0 Safari/537.36"
+            )
+        },
+        # Prefer non-web clients first; can reduce bot-check frequency on some hosts.
+        "extractor_args": {
+            "youtube": {
+                "player_client": ["android", "ios", "web"],
+            }
+        },
     }
+
     if _FFMPEG_LOCATION:
         ydl_opts["ffmpeg_location"] = _FFMPEG_LOCATION
+
+    cookiefile = _cookiefile_from_env()
+    if cookiefile:
+        ydl_opts["cookiefile"] = cookiefile
+
+    return ydl_opts
+
+
+def search_youtube(song_name: str) -> list[dict[str, Any]]:
+    """Return up to 5 YouTube search results for a song query."""
+    ydl_opts = _base_ydl_opts()
+    ydl_opts.update(
+        {
+            "skip_download": True,
+            "extract_flat": "in_playlist",
+        }
+    )
 
     with YoutubeDL(ydl_opts) as ydl:
         result = ydl.extract_info(f"ytsearch5:{song_name}", download=False)
@@ -70,20 +131,20 @@ def download_song_as_mp3(
 
     query = video_url or f"ytsearch1:{song_name}"
 
-    ydl_opts: dict[str, Any] = {
-        "format": "bestaudio/best",
-        "outtmpl": output_template,
-        "quiet": True,
-        "noplaylist": True,
-        "ffmpeg_location": _FFMPEG_LOCATION,
-        "postprocessors": [
-            {
-                "key": "FFmpegExtractAudio",
-                "preferredcodec": "mp3",
-                "preferredquality": selected_quality,
-            }
-        ],
-    }
+    ydl_opts = _base_ydl_opts()
+    ydl_opts.update(
+        {
+            "format": "bestaudio/best",
+            "outtmpl": output_template,
+            "postprocessors": [
+                {
+                    "key": "FFmpegExtractAudio",
+                    "preferredcodec": "mp3",
+                    "preferredquality": selected_quality,
+                }
+            ],
+        }
+    )
 
     with YoutubeDL(ydl_opts) as ydl:
         ydl.extract_info(query, download=True)
