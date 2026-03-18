@@ -5,9 +5,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
 if __package__:
-    from .downloader import download_song_as_mp3, search_youtube
+    from .downloader import download_song_as_mp3, get_runtime_status, search_youtube
 else:
-    from downloader import download_song_as_mp3, search_youtube
+    from downloader import download_song_as_mp3, get_runtime_status, search_youtube
 
 app = FastAPI(title="Song Downloader API", version="1.0.0")
 
@@ -23,6 +23,14 @@ app.add_middleware(
 @app.get("/health")
 async def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/runtime-check")
+async def runtime_check() -> dict[str, object]:
+    """Return safe runtime diagnostics helpful for deployment debugging."""
+    status = get_runtime_status()
+    status["status"] = "ok"
+    return status
 
 
 @app.get("/search")
@@ -47,6 +55,16 @@ async def download_song(
             quality=quality,
         )
     except Exception as exc:
+        error_text = str(exc)
+        lowered = error_text.lower()
+        if "sign in to confirm" in lowered and "not a bot" in lowered:
+            raise HTTPException(
+                status_code=503,
+                detail=(
+                    "YouTube blocked this server request. Configure YTDLP_COOKIES_B64 "
+                    "or YTDLP_COOKIEFILE on Render and redeploy."
+                ),
+            ) from exc
         raise HTTPException(status_code=500, detail=f"Download failed: {exc}") from exc
 
     return FileResponse(

@@ -21,6 +21,30 @@ DOWNLOADS_DIR = ensure_directory(Path(__file__).parent / "downloads")
 ALLOWED_MP3_QUALITIES = {"128", "192", "320"}
 
 
+def get_runtime_status() -> dict[str, object]:
+    """Return non-sensitive runtime diagnostics for deployment troubleshooting."""
+    cookie_mode = "none"
+    if os.getenv("YTDLP_COOKIEFILE"):
+        cookie_mode = "file"
+    elif os.getenv("YTDLP_COOKIES_B64"):
+        cookie_mode = "base64"
+
+    cookiefile_resolved = False
+    cookiefile_error = ""
+    try:
+        cookiefile_resolved = bool(_cookiefile_from_env())
+    except Exception as exc:
+        cookiefile_error = str(exc)
+
+    return {
+        "ffmpeg_location": _FFMPEG_LOCATION or "",
+        "ffmpeg_found": bool(_FFMPEG_LOCATION),
+        "cookie_mode": cookie_mode,
+        "cookiefile_resolved": cookiefile_resolved,
+        "cookiefile_error": cookiefile_error,
+    }
+
+
 def _cookiefile_from_env() -> str | None:
     """Resolve yt-dlp cookiefile from env vars.
 
