@@ -1,15 +1,14 @@
 import shutil
+import os
 from pathlib import Path
 from typing import Any
 
 from yt_dlp import YoutubeDL
 
-# Locate ffmpeg: prefer PATH, fall back to known WinGet install location
+# Locate ffmpeg from env or PATH. Avoid hardcoded OS-specific fallbacks.
+_FFMPEG_ENV = os.getenv("FFMPEG_LOCATION")
 _FFMPEG_PATH = shutil.which("ffmpeg")
-if _FFMPEG_PATH:
-    _FFMPEG_LOCATION = str(Path(_FFMPEG_PATH).parent)
-else:
-    _FFMPEG_LOCATION = r"C:\Users\ASUS\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.0.1-full_build\bin"
+_FFMPEG_LOCATION = _FFMPEG_ENV or (str(Path(_FFMPEG_PATH).parent) if _FFMPEG_PATH else None)
 
 if __package__:
     from .utils import ensure_directory, slugify_song_name
@@ -26,8 +25,9 @@ def search_youtube(song_name: str) -> list[dict[str, Any]]:
         "quiet": True,
         "skip_download": True,
         "extract_flat": "in_playlist",
-        "ffmpeg_location": _FFMPEG_LOCATION,
     }
+    if _FFMPEG_LOCATION:
+        ydl_opts["ffmpeg_location"] = _FFMPEG_LOCATION
 
     with YoutubeDL(ydl_opts) as ydl:
         result = ydl.extract_info(f"ytsearch5:{song_name}", download=False)
@@ -59,6 +59,11 @@ def download_song_as_mp3(
     quality: str = "192",
 ) -> Path:
     """Download a song from YouTube and convert it to MP3."""
+    if not _FFMPEG_LOCATION:
+        raise RuntimeError(
+            "FFmpeg is not installed or not in PATH. On Render, install ffmpeg or set FFMPEG_LOCATION."
+        )
+
     selected_quality = quality if quality in ALLOWED_MP3_QUALITIES else "192"
     base_name = slugify_song_name(song_name)
     output_template = str(DOWNLOADS_DIR / f"{base_name}.%(ext)s")

@@ -5,6 +5,7 @@ function DownloadButton({ songTitle, videoUrl }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [quality, setQuality] = useState("192");
+  const apiBase = process.env.REACT_APP_API_BASE_URL || "";
 
   const handleDownload = async () => {
     setLoading(true);
@@ -15,11 +16,22 @@ function DownloadButton({ songTitle, videoUrl }) {
         video_url: videoUrl,
         quality,
       });
-      const response = await fetch(`/download?${params.toString()}`);
+      const downloadPath = `/download?${params.toString()}`;
+      const downloadUrl = apiBase ? `${apiBase}${downloadPath}` : downloadPath;
+      const response = await fetch(downloadUrl);
       if (!response.ok) {
         const text = await response.text();
         throw new Error(text || "Download failed");
       }
+
+      const contentType = (response.headers.get("content-type") || "").toLowerCase();
+      if (!contentType.includes("audio/mpeg")) {
+        const text = await response.text();
+        throw new Error(
+          text || "Download endpoint did not return an MP3 file. Check API base URL/deployment rewrites."
+        );
+      }
+
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
