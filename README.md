@@ -130,6 +130,43 @@ Frontend runs at: `http://localhost:3000`
 
 ---
 
+## 🌐 Live Deployment
+
+- Frontend (Vercel): https://song-downloader-9tj0hc3uq-jais-projects-f1c2e068.vercel.app/
+- Backend (Render): https://song-downloader-app-backend.onrender.com
+- Backend Health Check: https://song-downloader-app-backend.onrender.com/health
+
+You can use the frontend URL directly. It is connected to the deployed backend on Render.
+
+---
+
+## ⚙️ Production Environment Variables
+
+For hosted frontend deployments (Vercel/Netlify), set:
+
+- `REACT_APP_API_BASE_URL=https://song-downloader-app-backend.onrender.com`
+
+This ensures both search and download requests go to the deployed backend.
+
+---
+
+## ✅ Quick Production Test
+
+1. Open the Vercel URL.
+2. Search for any song title.
+3. Pick a result and select quality (128/192/320).
+4. Click **Download MP3** and confirm the downloaded file plays correctly.
+
+---
+
+## 📝 Deployment Notes
+
+- Render free instances may take a few seconds to wake up on the first request.
+- Keep FFmpeg available in the Render environment for successful conversion.
+- If downloads fail in production, first test `GET /health`, then `GET /search`.
+
+---
+
 ## 🔌 API Endpoints
 
 ### `GET /health`
