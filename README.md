@@ -28,18 +28,13 @@ This project is built for **learning backend architecture, API integration, and 
 
 ### Demo Video
 
-<video src="assets/demo.mp4" controls width="900">
-  Your browser does not support the video tag. You can download the demo from
-  <a href="assets/demo.mp4">assets/demo.mp4</a>.
-</video>
+[![Watch Demo Video](assets/Landing%20page.png)](assets/demo.mp4)
+
+Demo file: [assets/demo.mp4](assets/demo.mp4)
 
 ### Downloaded Song Sample
 
-<audio controls>
-  <source src="assets/Love%20Me.mp3" type="audio/mpeg" />
-  Your browser does not support the audio element. You can download the song from
-  <a href="assets/Love%20Me.mp3">assets/Love Me.mp3</a>.
-</audio>
+Song file: [assets/Love Me.mp3](assets/Love%20Me.mp3)
 
 ---
 
