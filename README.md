@@ -18,6 +18,31 @@ This project is built for **learning backend architecture, API integration, and 
 
 ---
 
+## 📸 App Preview
+
+### Screenshots
+
+![Landing Page](assets/Landing%20page.png)
+![Searching Song](assets/searching%20song.png)
+![Watching Preview](assets/watching%20preview.png)
+
+### Demo Video
+
+<video src="assets/Screen%20Recording%202026-03-27%20111426.mp4" controls width="900">
+  Your browser does not support the video tag. You can download the demo from
+  <a href="assets/Screen%20Recording%202026-03-27%20111426.mp4">assets/Screen Recording 2026-03-27 111426.mp4</a>.
+</video>
+
+### Downloaded Song Sample
+
+<audio controls>
+  <source src="assets/Love%20Me.mp3" type="audio/mpeg" />
+  Your browser does not support the audio element. You can download the song from
+  <a href="assets/Love%20Me.mp3">assets/Love Me.mp3</a>.
+</audio>
+
+---
+
 ## 🧠 Tech Stack
 
 | Layer | Technology |
