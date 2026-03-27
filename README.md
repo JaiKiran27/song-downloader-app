@@ -28,9 +28,9 @@ This project is built for **learning backend architecture, API integration, and 
 
 ### Demo Video
 
-<video src="assets/Screen%20Recording%202026-03-27%20111426.mp4" controls width="900">
+<video src="assets/demo.mp4" controls width="900">
   Your browser does not support the video tag. You can download the demo from
-  <a href="assets/Screen%20Recording%202026-03-27%20111426.mp4">assets/Screen Recording 2026-03-27 111426.mp4</a>.
+  <a href="assets/demo.mp4">assets/demo.mp4</a>.
 </video>
 
 ### Downloaded Song Sample
